@@ -1,0 +1,26 @@
+{
+  "status": 0,
+  "msg": "success",
+  "data": {
+    "id": 9,
+    "title": "深入研究 Java 中的 char 类型",
+    "content": "众所周知在 Java 中，char 类型是可以储存汉字的，你可以以 `char='人'` 的方式对其进行赋值，也可以直接以指定编码进行赋值如：`char = '\\u4eba'`。\n\n能达到这种效果的原因是 Java 的 char 类型比较特殊，它是以 Unicode 编码对字符进行存储，即每个 char 类型有 16bit，这一点从允许直接使用 Unicode 码的形式给 char 类型赋值就可以得知。显然，Java 中的 char 类型以 UTF-16 规范进行编码。\n\n> **注意**：Unicode 的实现方式不同于编码方式。一个字符的 Unicode 编码是确定的。但是在实际传输过程中，由于不同系统平台的设计不一定一致，以及出于节省空间的目的，对 Unicode 编码的实现方式有所不同，具体由UTF(UCS Transformation Format)规范规定，常见的UTF规范包括UTF-8、UTF-16、UTF-32。\n\n了解了这一点，我们再来看以下一段代码\n\n```java\npublic static void main(String[] args) {\n\tString s = \"人\";\n\tfinal byte[] bytes1 = s.getBytes(StandardCharsets.UTF_8);\n\tSystem.out.println(bytes1.length);\n\tfinal byte[] bytes2 = s.getBytes(StandardCharsets.UTF_16);\n\tSystem.out.println(bytes2.length);\n}\n```\n执行结果\n```\n3\n4\n```\n\n为什么在实际测试中单字符以 UTF-8 的编码输出的是标准的三字节，以 UTF-16 编码输出的却不是预期的两字节而是四字节呢？\n\n> 实际上，多出来的两个字节是因为在 Unicode 编码中，要特地指定字节序——即字节的顺序。大于一个字节的数据在内存中存放的的顺序有两种：大字节序 BIG-ENDIAN 和小字节序 LITTLE-ENDIAN。\n\n传输协议中，需要先传一个标识，一个叫 `ZERO WIDTH NO-BREAK SPACE` 的字符，它的编码是 FEFF。而 FFFE 在 Unicode 中是不存在的字符，所以不应该出现在实际传输中。Unicode规范建议在传输字节流前，先传输字符 \"ZERO WIDTH NO-BREAK SPACE\"。这样就多出了两个字节。\n\n经过实际测试我们可以明显发现在以 UTF-16 编码的字节数组中字节序的存在：\n\n```java\npublic static void main(String[] args) {\n\tString s = \"人\";\n\tfinal byte[] bytes1 = s.getBytes(StandardCharsets.UTF_16);\n\tfor (byte b : bytes1) {\n\t\tSystem.out.print(b + \" \\n\");\n\t}\n\ts = \"人们\";\n\tfinal byte[] bytes2 = s.getBytes(StandardCharsets.UTF_16);\n\tfor (byte b : bytes2) {\n\t\tSystem.out.print(b + \" \");\n\t}\n}\n```\n\n```\n-2 -1 78 -70 \n-2 -1 78 -70 78 -20\n```\n\n其中每行输出的起始两个数字 -2 -1 对应的正是以 8 位 bit 表示的 FE、FF。而 `BIG-ENDIAN`、`LITTLE-ENDIAN` 的说法也早在对应字符标准中被提及\n\n```java\n/**\n * Sixteen-bit UCS Transformation Format, big-endian byte order\n */\npublic static final Charset UTF_16BE = Charset.forName(\"UTF-16BE\");\n/**\n * Sixteen-bit UCS Transformation Format, little-endian byte order\n */\npublic static final Charset UTF_16LE = Charset.forName(\"UTF-16LE\");\n```\n",
+    "summary": "Java 的 char 类型比较特殊，它是以 Unicode 编码对字符进行存储，即每个 char 类型有 16bit，这一点从允许直接使用 Unicode 码的形式给 char 类型赋值就可以得知。显然，Java 中的 char 类型以 UTF-16 规范进行编码。",
+    "cover": "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F9e82b257641733eefe562d0d4295d895406da851.jpg&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1656845557&t=63a660de24141af33c7e53358941016d",
+    "flag": 0,
+    "views": 10,
+    "appreciation": true,
+    "shareStatement": true,
+    "commentable": true,
+    "createTime": "2022-06-03T10:53:32.000+00:00",
+    "updateTime": "2022-06-03T10:53:32.000+00:00",
+    "minUser": null,
+    "tags": [
+      {
+        "id": 1,
+        "name": "Easy"
+      }
+    ],
+    "rateComments": []
+  }
+}

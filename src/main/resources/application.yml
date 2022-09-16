@@ -1,0 +1,31 @@
+server:
+  port: 80
+  servlet:
+    session:
+      # 设置 Tomcat 获取会话信息的方式
+      # 防止首次访问时 Thymeleaf 更改 URL 导致渲染出错
+      tracking-modes: COOKIE
+  # 过滤的ip地址，0.0.0.0即允许局域网内访问
+  address: 0.0.0.0
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  thymeleaf:
+    cache: false
+    # 此处路径前有 /, 故返回视图时直接写名称即可
+    prefix: classpath:/templates/
+    suffix: .html
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  type-aliases-package: com.illtamer.sillage.rear.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    root: INFO
+  file:
+    path: sillage/log/
