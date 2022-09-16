@@ -29,3 +29,4 @@ build/
 
 ### Custom ###
 /sillage
+jdbc.properties
