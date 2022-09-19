@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 /**
  * SpringSecurity 用户 Service 类
  * <p>
- * Expose UserDetailsService as a service {@link WebSecurityConfigurerAdapter#configure(AuthenticationManagerBuilder)}
+ * Expose UserDetailsService as a service, then it will be actively registered
+ * {@link WebSecurityConfigurerAdapter#configure(AuthenticationManagerBuilder)}
  * */
 @Service
 public class LoginUserService implements UserDetailsService {

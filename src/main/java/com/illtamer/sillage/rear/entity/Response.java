@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 响应结果实体类
@@ -46,7 +47,7 @@ public class Response implements Serializable {
     }
 
     /**
-     * 初始化一个新创建的 AjaxResult 对象
+     * 初始化一个新创建的 Response 对象
      *
      * @param status 状态类型
      * @param msg  返回内容
@@ -56,6 +57,14 @@ public class Response implements Serializable {
         this.status = status;
         this.msg = msg;
         this.data = data;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", status);
+        map.put("msg", msg);
+        map.put("data", data);
+        return map;
     }
 
     /**

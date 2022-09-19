@@ -13,8 +13,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.6.6</spring-boot.version>
         <mybatis.plus.spring.version>3.4.0</mybatis.plus.spring.version>
-        <druid.version>1.2.8</druid.version>
-        <commonmark.version>0.17.0</commonmark.version>
+        <druid.version>1.2.12</druid.version>
+        <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
     <dependencies>
@@ -36,21 +36,11 @@
             <version>${mybatis.plus.spring.version}</version>
         </dependency>
 
-        <!-- markdown -> html -->
+        <!-- jwt -->
         <dependency>
-            <groupId>com.atlassian.commonmark</groupId>
-            <artifactId>commonmark</artifactId>
-            <version>${commonmark.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.commonmark</groupId>
-            <artifactId>commonmark-ext-heading-anchor</artifactId>
-            <version>${commonmark.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.commonmark</groupId>
-            <artifactId>commonmark-ext-gfm-tables</artifactId>
-            <version>${commonmark.version}</version>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
         </dependency>
 
         <dependency>
