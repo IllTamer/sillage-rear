@@ -1,7 +1,7 @@
 package com.illtamer.sillage.rear.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.illtamer.sillage.rear.mapper.BlogTagMapper;
 import com.illtamer.sillage.rear.mapper.TagMapper;
@@ -16,10 +16,16 @@ import java.util.stream.Collectors;
 @Service
 public class TagService extends ServiceImpl<TagMapper, Tag> {
 
+    public static final int MAX_PAGE_SIZE = 15;
+
     private final BlogTagMapper blogTagMapper;
 
     public TagService(BlogTagMapper blogTagMapper) {
         this.blogTagMapper = blogTagMapper;
+    }
+
+    public Page<Tag> listTag(Integer index) {
+        return page(new Page<>(index, MAX_PAGE_SIZE));
     }
 
     /**

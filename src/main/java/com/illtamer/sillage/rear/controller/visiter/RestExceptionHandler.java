@@ -1,4 +1,4 @@
-package com.illtamer.sillage.rear.controller;
+package com.illtamer.sillage.rear.controller.visiter;
 
 import com.illtamer.sillage.rear.entity.Response;
 import lombok.extern.slf4j.Slf4j;

@@ -41,7 +41,7 @@ public class JwtUtil {
      * @param ttlMillis token超时时间
      */
     public static String createJWT(String subject, Long ttlMillis) {
-        return createJWT(subject, getUUID(), ttlMillis);
+        return createJWT(getUUID(), subject, ttlMillis);
     }
 
     /**
@@ -94,7 +94,7 @@ public class JwtUtil {
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
 
-    private static String getUUID(){
+    public static String getUUID(){
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 

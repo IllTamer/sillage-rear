@@ -1,11 +1,8 @@
-package com.illtamer.sillage.rear.controller;
+package com.illtamer.sillage.rear.controller.visiter;
 
 import com.illtamer.sillage.rear.entity.Response;
 import com.illtamer.sillage.rear.service.TagService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
@@ -16,6 +13,11 @@ public class TagController {
 
     public TagController(TagService tagService) {
         this.tagService = tagService;
+    }
+
+    @GetMapping("/{index}")
+    public Response getTagPage(@PathVariable Integer index) {
+        return Response.success(tagService.listTag(index));
     }
 
     @GetMapping("/list")

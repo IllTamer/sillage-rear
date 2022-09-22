@@ -8,14 +8,20 @@ import com.illtamer.sillage.rear.mapper.BlogMapper;
 import com.illtamer.sillage.rear.mapper.UserMapper;
 import com.illtamer.sillage.rear.pojo.Blog;
 import com.illtamer.sillage.rear.pojo.Tag;
+import com.illtamer.sillage.rear.pojo.Type;
 import com.illtamer.sillage.rear.vo.*;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 @Service
@@ -23,6 +29,7 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
 
     public static final int MAX_PAGE_SIZE = 10;
 
+    private TypeService typeService;
     private final TagService tagService;
     private final CommentService commentService;
     private final UserService userService;
@@ -146,10 +153,37 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
                 .eq(Blog::getTypeId, typeId));
     }
 
+    /**
+     * 查询管理页文章 VO
+     * */
+    public Page<ManageBlog> listManageBlogs(Integer index, @Nullable String title, @Nullable Integer typeId, @Nullable Boolean recommend) {
+        final LambdaQueryWrapper<Blog> wrapper = Wrappers.lambdaQuery(Blog.class)
+                .select(Blog::getId, Blog::getTitle, Blog::getTypeId, Blog::getRecommend, Blog::getViews, Blog::getUpdateTime, Blog::getPublished);
+        if (typeId != null)
+            wrapper.eq(Blog::getTypeId, typeId);
+        if (recommend != null)
+            wrapper.eq(Blog::getRecommend, recommend);
+        if (title != null)
+            wrapper.like(Blog::getTitle, title);
+        final Page<Blog> blogPage = page(new Page<>(index, MAX_PAGE_SIZE), wrapper);
+        final Page<ManageBlog> manageBlogPage = new Page<ManageBlog>().setRecords(blogPage.getRecords().stream()
+                .map(blog -> {
+                    ManageBlog manageBlog = new ManageBlog();
+                    BeanUtils.copyProperties(blog, manageBlog);
+                    final Type type = typeService.getById(blog.getTypeId());
+                    manageBlog.setType(type);
+                    return manageBlog;
+                }).collect(Collectors.toList()));
+        BeanUtils.copyProperties(blogPage, manageBlogPage, "records");
+        return manageBlogPage;
+    }
+
+
+
     protected Page<HomeBlog> generateHomeBlogPage(int index, LambdaQueryWrapper<Blog> wrapper) {
         final Page<Blog> blogPage = page(new Page<>(index, MAX_PAGE_SIZE), wrapper);
         final List<HomeBlog> homeBlogs = generateHomeBlogList(blogPage.getRecords());
-        Page<HomeBlog> homeBlogPage = new Page<HomeBlog>().setRecords(homeBlogs);
+        final Page<HomeBlog> homeBlogPage = new Page<HomeBlog>().setRecords(homeBlogs);
         BeanUtils.copyProperties(blogPage, homeBlogPage, "records");
         return homeBlogPage;
     }
@@ -172,6 +206,11 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
             BeanUtils.copyProperties(blog, minBlog);
             return minBlog;
         }).collect(Collectors.toList());
+    }
+
+    @Autowired
+    public void setTypeService(TypeService typeService) {
+        this.typeService = typeService;
     }
 
 }

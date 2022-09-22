@@ -37,6 +37,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("token");
         if (!StringUtils.hasText(token)) {
+            // 跨域 OPTIONS 预请求放行，反馈响应头（不带特殊请求头
+            if (request.getMethod().equals("OPTIONS")) {
+                response.setStatus(200);
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                response.setHeader("Access-Control-Allow-Headers", "*");
+                response.setHeader("Access-Control-Allow-Methods", "*");
+                return;
+            }
+            // TODO json response
             // 直接放行 让后面原生的 UsernamePasswordAuthenticationFilter 去拦截
             filterChain.doFilter(request, response);
             return;

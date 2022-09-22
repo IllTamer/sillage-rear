@@ -25,7 +25,7 @@ public class LoggingAspect {
     /**
      * 切面 - 所有 controller 同级包内类的所有方法
      * */
-    @Pointcut("execution(* com.illtamer.sillage.rear.controller.*.*(..))")
+    @Pointcut("execution(* com.illtamer.sillage.rear.controller.*.*.*(..))")
     private void point() {}
 
     @Before("point()")

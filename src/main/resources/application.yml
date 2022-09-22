@@ -9,6 +9,8 @@ server:
   address: 0.0.0.0
 
 spring:
+  main:
+    allow-circular-references: true
   devtools:
     restart:
       enabled: true

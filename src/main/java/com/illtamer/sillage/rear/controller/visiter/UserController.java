@@ -1,9 +1,8 @@
-package com.illtamer.sillage.rear.controller;
+package com.illtamer.sillage.rear.controller.visiter;
 
 import com.illtamer.sillage.rear.entity.Response;
 import com.illtamer.sillage.rear.service.UserService;
 import com.illtamer.sillage.rear.vo.AuthData;
-import com.illtamer.sillage.rear.vo.JwtToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 

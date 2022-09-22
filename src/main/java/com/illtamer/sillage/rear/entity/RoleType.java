@@ -10,9 +10,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RoleType {
 
+    /**
+     * 管理员
+     * */
     ADMIN("ROLE_ADMIN", -1),
 
-    VISITOR("ROLE_VISITOR", 0);
+    /**
+     * 游客
+     * */
+    VISITOR("ROLE_VISITOR", 0),
+
+    /**
+     * 用户
+     * */
+    USER("ROLE_USER", 1);
 
     /**
      * 用户角色
