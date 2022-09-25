@@ -9,12 +9,14 @@ import com.illtamer.sillage.rear.mapper.UserMapper;
 import com.illtamer.sillage.rear.pojo.Blog;
 import com.illtamer.sillage.rear.pojo.Tag;
 import com.illtamer.sillage.rear.pojo.Type;
+import com.illtamer.sillage.rear.pojo.User;
 import com.illtamer.sillage.rear.vo.*;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -47,6 +49,7 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
     /**
      * 获取文章详情 VO
      * */
+    @Transactional
     public DetailBlog getDetailBlog(Integer blogId) {
         final DetailBlog detailBlog = new DetailBlog();
         final Blog blog = getById(blogId);
@@ -58,6 +61,7 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
         detailBlog.setTags(tags);
         final Collection<RateComment> rateComments = commentService.listTopCommentByBlogId(blogId);
         detailBlog.setRateComments(rateComments);
+        updateViews(blogId);
         return detailBlog;
     }
 
@@ -178,7 +182,39 @@ public class BlogService extends ServiceImpl<BlogMapper, Blog> {
         return manageBlogPage;
     }
 
+    /**
+     * 保存发布博客 VO
+     * */
+    @Transactional(rollbackFor = Exception.class)
+    public InsertResponse savePublishBlog(PublishBlog publishBlog, User user) {
+        Blog blog = new Blog();
+        BeanUtils.copyProperties(publishBlog, blog);
+        blog.setUserId(user.getId());
+        InsertResponse response = new InsertResponse();
+        if (blog.getId() == -1) {
+            response.setSuccess(save(blog));
+        } else {
+            response.setSuccess(updateById(blog));
+        }
+        tagService.saveTagIdListByBlogId(publishBlog.getTagIdList(), blog.getId());
+        response.setObjectId(blog.getId());
+        return response;
+    }
 
+    public PublishBlog getPublishBlog(Integer id) {
+        final Blog blog = getById(id);
+        PublishBlog publishBlog = new PublishBlog();
+        BeanUtils.copyProperties(blog, publishBlog);
+        final List<Integer> tagIdList = new ArrayList<>(tagService.listTagIdByBlogId(id));
+        publishBlog.setTagIdList(tagIdList);
+        return publishBlog;
+    }
+
+    public boolean updateViews(Integer id) {
+        return update(Wrappers.lambdaUpdate(Blog.class)
+                .eq(Blog::getId, id)
+                .setSql("`views` = `views` + 1"));
+    }
 
     protected Page<HomeBlog> generateHomeBlogPage(int index, LambdaQueryWrapper<Blog> wrapper) {
         final Page<Blog> blogPage = page(new Page<>(index, MAX_PAGE_SIZE), wrapper);

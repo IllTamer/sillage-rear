@@ -1,6 +1,6 @@
 package com.illtamer.sillage.rear.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.illtamer.sillage.rear.config.GlobalCache;
 import com.illtamer.sillage.rear.entity.LoginUser;
@@ -10,13 +10,16 @@ import com.illtamer.sillage.rear.util.JwtUtil;
 import com.illtamer.sillage.rear.vo.AuthData;
 import com.illtamer.sillage.rear.vo.JwtToken;
 import com.illtamer.sillage.rear.vo.MinUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserService extends ServiceImpl<UserMapper, User> {
 
@@ -69,17 +72,29 @@ public class UserService extends ServiceImpl<UserMapper, User> {
      * 查询最简用户 VO
      * */
     public MinUser getMinUserById(Integer id) {
-        final LambdaQueryWrapper<User> wrapper = getWrapper()
+        final User user = getOne(Wrappers.lambdaQuery(User.class)
                 .select(User::getId, User::getNick, User::getAvatar)
-                .eq(User::getId, id);
-        final User user = getOne(wrapper);
+                .eq(User::getId, id));
         final MinUser minUser = new MinUser();
         BeanUtils.copyProperties(user, minUser);
         return minUser;
     }
 
-    private static LambdaQueryWrapper<User> getWrapper() {
-        return new LambdaQueryWrapper<>();
+    /**
+     * 从已发放的有效 Jwt Token 中获取登录用户实例
+     * */
+    @Nullable
+    public LoginUser getLoginUser(String userId) {
+        if (userId == null || userId.length() == 0) return null;
+        LoginUser loginUser = (LoginUser) globalCache.get(userId);
+        if (loginUser != null) return loginUser;
+        try {
+            final User user = getById(Integer.parseInt(userId));
+            return new LoginUser(user);
+        } catch (Exception e) {
+            log.error("Unknown error occurred when re-cache login user {}", userId, e);
+        }
+        return null;
     }
 
 }

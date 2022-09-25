@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8888
   servlet:
     session:
       # 设置 Tomcat 获取会话信息的方式
@@ -13,12 +13,7 @@ spring:
     allow-circular-references: true
   devtools:
     restart:
-      enabled: true
-  thymeleaf:
-    cache: false
-    # 此处路径前有 /, 故返回视图时直接写名称即可
-    prefix: classpath:/templates/
-    suffix: .html
+      enabled: false
   # restful 配置
   mvc:
     throw-exception-if-no-handler-found: true
@@ -27,7 +22,6 @@ spring:
       add-mappings: false
 
 mybatis-plus:
-  mapper-locations: classpath:mapper/*Mapper.xml
   type-aliases-package: com.illtamer.sillage.rear.pojo
   configuration:
     log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl

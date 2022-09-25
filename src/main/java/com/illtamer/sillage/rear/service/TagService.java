@@ -8,6 +8,7 @@ import com.illtamer.sillage.rear.mapper.TagMapper;
 import com.illtamer.sillage.rear.pojo.BlogTag;
 import com.illtamer.sillage.rear.pojo.Tag;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,21 @@ public class TagService extends ServiceImpl<TagMapper, Tag> {
                 .select(BlogTag::getTagId)
                 .eq(BlogTag::getBlogId, blogId));
         return blogTags.stream().map(BlogTag::getTagId).collect(Collectors.toSet());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveTagIdListByBlogId(List<Integer> tagIdList, Integer blogId) {
+        boolean success = true;
+        for (BlogTag blogTag : tagIdList.stream()
+                .map(tagId -> {
+                    final BlogTag blogTag = new BlogTag();
+                    blogTag.setBlogId(blogId);
+                    blogTag.setTagId(tagId);
+                    return blogTag;
+                }).collect(Collectors.toList())) {
+            success = success && blogTagMapper.insert(blogTag) > 0;
+        }
+        return success;
     }
 
 }

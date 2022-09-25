@@ -2,8 +2,10 @@ package com.illtamer.sillage.rear.config.security;
 
 import com.illtamer.sillage.rear.config.GlobalCache;
 import com.illtamer.sillage.rear.entity.LoginUser;
+import com.illtamer.sillage.rear.service.UserService;
 import com.illtamer.sillage.rear.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,11 +29,7 @@ import java.util.Objects;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    private final GlobalCache globalCache;
-
-    public JwtAuthenticationTokenFilter(GlobalCache globalCache) {
-        this.globalCache = globalCache;
-    }
+    private UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -61,7 +59,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         }
 
         // 获取用户信息
-        LoginUser loginUser = (LoginUser) globalCache.get(userId);
+        LoginUser loginUser = userService.getLoginUser(userId);
         if (Objects.isNull(loginUser)){
             throw new RuntimeException("用户未登录或登录信息已过期");
         }
@@ -75,6 +73,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         );
         // 放行
         filterChain.doFilter(request, response);
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
 }

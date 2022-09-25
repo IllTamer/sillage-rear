@@ -1,5 +1,6 @@
 package com.illtamer.sillage.rear.config.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,11 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
-
-    public SecurityConfiguration(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
-        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
-    }
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -52,6 +49,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Autowired
+    public void setJwtAuthenticationTokenFilter(JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
+        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
     }
 
 }
